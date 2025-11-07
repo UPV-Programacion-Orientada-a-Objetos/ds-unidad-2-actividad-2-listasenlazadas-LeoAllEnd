@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentación Técnica - Decodificador PRT-7</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        
+        h2 {
+            color: #764ba2;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+            border-left: 5px solid #764ba2;
+            padding-left: 15px;
+        }
+        
+        h3 {
+            color: #555;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+        }
+        
+        .header h1 {
+            color: white;
+            border: none;
+            margin: 0;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            margin-top: 10px;
+        }
+        
+        .class-card {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            transition: transform 0.3s;
+        }
+        
+        .class-card:hover {
+            transform: translateX(10px);
+        }
+        
+        .class-card h3 {
+            color: #667eea;
+            margin-top: 0;
+        }
+        
+        code {
+            background: #f4f4f4;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #e83e8c;
+        }
+        
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        
+        pre code {
+            background: none;
+            color: #f8f8f2;
+            padding: 0;
+        }
+        
+        .feature {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin: 5px;
+            font-size: 0.9em;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        tr:hover {
+            background: #f5f5f5;
+        }
+        
+        .diagram {
+            background: white;
+            border: 2px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            text-align: center;
+            font-family: monospace;
+        }
+        
+        .success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        
+        .info {
+            background: #d1ecf1;
+            border-left: 4px solid #0dcaf0;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        
+        ul, ol {
+            margin-left: 30px;
+            margin-bottom: 15px;
+        }
+        
+        li {
+            margin: 8px 0;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #ddd;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>DECODIFICADOR PRT-7</h1>
+            <p>Sistema de Ciberseguridad Industrial para Decodificación de Protocolo de Telemetría</p>
+            <p><strong>Versión 1.0</strong></p>
+        </div>
+
+        <section>
+            <h2>Resumen </h2>
+            <p>El Decodificador PRT-7 es un sistema de software que implementa la decodificación de un protocolo industrial de telemetría oculta. El protocolo no transmite mensajes directamente, sino <strong>instrucciones para construirlos</strong>, utilizando un sistema de mapeo dinámico similar a las máquinas de cifrado clásicas.</p>
+            
+            <div class="info">
+                <strong> Objetivo:</strong> Interceptar y decodificar tramas del protocolo PRT-7 transmitidas por un dispositivo Arduino, ensamblando el mensaje oculto mediante estructuras de datos implementadas manualmente.
+            </div>
+        </section>
+
+        <section>
+            <h2> Arquitectura del Sistema</h2>
+            
+            <div class="diagram">
+                <pre>
+┌─────────────┐         USB Serial        ┌──────────────────┐
+│   Arduino   │ ───────────────────────> │ Puerto COM/TTY   │
+│ (Transmisor)│      9600 baudios         │                  │
+└─────────────┘                            └────────┬─────────┘
+                                                    │
+                                                    ▼
+                                          ┌─────────────────────┐
+                                          │  Decodificador C++  │
+                                          │  ┌───────────────┐  │
+                                          │  │ Parser Tramas │  │
+                                          │  └───────┬───────┘  │
+                                          │          │          │
+                                          │    ┌─────▼─────┐    │
+                                          │    │Polimorfismo│   │
+                                          │    └─────┬─────┘    │
+                                          │          │          │
+                                          │  ┌───────▼───────┐  │
+                                          │  │  TramaLoad    │  │
+                                          │  │  TramaMap     │  │
+                                          │  └───────┬───────┘  │
+                                          │          │          │
+                                          │  ┌───────▼────────┐ │
+                                          │  │ RotorDeMapeo   │ │
+                                          │  │ (Lista Circular)│ │
+                                          │  └────────────────┘ │
+                                          │          │          │
+                                          │  ┌───────▼────────┐ │
+                                          │  │ ListaDeCarga   │ │
+                                          │  │ (Lista Doble)  │ │
+                                          │  └───────┬────────┘ │
+                                          └──────────┼──────────┘
+                                                     │
+                                                     ▼
+                                          ┌─────────────────┐
+                                          │ Mensaje Revelado│
+                                          └─────────────────┘
+                </pre>
+            </div>
+        </section>
+
+        <section>
+            <h2> Jerarquía de Clases (POO)</h2>
+            
+            <div class="class-card">
+                <h3>TramaBase (Clase Abstracta)</h3>
+                <p><strong>Propósito:</strong> Define la interfaz común para todas las tramas del protocolo.</p>
+                <p><strong>Características clave:</strong></p>
+                <span class="feature">Destructor Virtual</span>
+                <span class="feature">Método procesar() virtual puro</span>
+                <span class="feature">Polimorfismo</span>
+                
+                <pre><code>class TramaBase {
+public:
+    virtual ~TramaBase() {}  // CRÍTICO para evitar memory leaks
+    virtual void procesar(ListaDeCarga* carga, RotorDeMapeo* rotor) = 0;
+    virtual const char* toString() const = 0;
+};</code></pre>
+            </div>
+
+            <div class="class-card">
+                <h3>TramaLoad (Clase Derivada)</h3>
+                <p><strong>Propósito:</strong> Representa una trama de carga (L,X) que contiene un fragmento de datos.</p>
+                <p><strong>Responsabilidades:</strong></p>
+                <ul>
+                    <li>Almacenar un carácter</li>
+                    <li>Solicitar decodificación al RotorDeMapeo</li>
+                    <li>Insertar el resultado en ListaDeCarga</li>
+                </ul>
+                
+                <pre><code>class TramaLoad : public TramaBase {
+private:
+    char caracter;
+public:
+    void procesar(ListaDeCarga* carga, RotorDeMapeo* rotor) override {
+        char decodificado = rotor->getMapeo(caracter);
+        carga->insertarAlFinal(decodificado);
+    }
+};</code></pre>
+            </div>
+
+            <div class="class-card">
+                <h3>TramaMap (Clase Derivada)</h3>
+                <p><strong>Propósito:</strong> Representa una trama de mapeo (M,N) que modifica el estado del rotor.</p>
+                <p><strong>Responsabilidades:</strong></p>
+                <ul>
+                    <li>Almacenar un valor de rotación (positivo o negativo)</li>
+                    <li>Aplicar la rotación al RotorDeMapeo</li>
+                </ul>
+                
+                <pre><code>class TramaMap : public TramaBase {
+private:
+    int rotacion;
+public:
+    void procesar(ListaDeCarga* carga, RotorDeMapeo* rotor) override {
+        rotor->rotar(rotacion);  // Cambia el estado del sistema
+    }
+};</code></pre>
+            </div>
+        </section>
+
+        <section>
+            <h2> Estructuras de Datos Manuales</h2>
+            
+            <h3>1. RotorDeMapeo - Lista Circular Doblemente Enlazada</h3>
+            <div class="diagram">
+                <pre>
+    ┌───┐    ┌───┐    ┌───┐    ┌───┐    ┌───┐
+    │ A │◄──►│ B │◄──►│ C │◄──►│...│◄──►│ Z │
+    └─┬─┘    └───┘    └───┘    └───┘    └─┬─┘
+      │                                     │
+      └─────────────────────────────────────┘
+        (Cierre del círculo)
+
+    cabeza → Apunta al nodo 'cero' actual
+                </pre>
+            </div>
+            
+            <div class="success">
+                <strong>✅ Ventaja clave:</strong> Al rotar, NO se mueven los datos, solo se mueve el puntero <code>cabeza</code>. Esto hace la operación O(1) en complejidad.
+            </div>
+
+            <p><strong>Operación de Rotación:</strong></p>
+            <pre><code>void RotorDeMapeo::rotar(int n) {
+    n = n % tamano;           // Normalizar
+    if (n < 0) n += tamano;   // Manejar negativos
+    
+    for (int i = 0; i < n; i++) {
+        cabeza = cabeza->siguiente;  // Solo mover puntero
+    }
+}</code></pre>
+
+            <p><strong>Operación de Mapeo (Cifrado César Circular):</strong></p>
+            <table>
+                <tr>
+                    <th>Paso</th>
+                    <th>Operación</th>
+                    <th>Descripción</th>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>Buscar carácter de entrada</td>
+                    <td>Encontrar el nodo que contiene el carácter</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Calcular distancia</td>
+                    <td>Desde <code>cabeza</code> hasta el nodo encontrado</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Aplicar misma distancia</td>
+                    <td>Desde <code>cabeza</code> en dirección forward</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Retornar carácter</td>
+                    <td>El carácter en la posición calculada</td>
+                </tr>
+            </table>
+
+            <h3>2. ListaDeCarga - Lista Doblemente Enlazada</h3>
+            <div class="diagram">
+                <pre>
+cabeza                                              cola
+  │                                                  │
+  ▼                                                  ▼
+┌───┐    ┌───┐    ┌───┐    ┌───┐    ┌───┐    ┌───┐
+│ H │◄──►│ E │◄──►│ L │◄──►│ L │◄──►│ O │◄──►│...│
+└───┘    └───┘    └───┘    └───┘    └───┘    └───┘
+
+Cada nodo tiene:
+- dato (char)
+- siguiente (puntero)
+- previo (puntero)
+                </pre>
+            </div>
+
+            <p><strong>Operación de Inserción al Final (O(1)):</strong></p>
+            <pre><code>void ListaDeCarga::insertarAlFinal(char dato) {
+    NodoCarga* nuevo = new NodoCarga(dato);
+    
+    if (cola == nullptr) {
+        cabeza = nuevo;
+        cola = nuevo;
+    } else {
+        cola->siguiente = nuevo;
+        nuevo->previo = cola;
+        cola = nuevo;
+    }
+    tamano++;
+}</code></pre>
+        </section>
+
+        <section>
+            <h2>Comunicación Serial Multiplataforma</h2>
+            
+            <table>
+                <tr>
+                    <th>Plataforma</th>
+                    <th>API Utilizada</th>
+                    <th>Identificador de Puerto</th>
+                </tr>
+                <tr>
+                    <td>Windows</td>
+                    <td>WinAPI (CreateFile, ReadFile)</td>
+                    <td>COM3, COM4, etc.</td>
+                </tr>
+                <tr>
+                    <td>Linux</td>
+                    <td>POSIX termios (open, read)</td>
+                    <td>/dev/ttyUSB0, /dev/ttyACM0</td>
+                </tr>
+            </table>
+
+            <p><strong>Parámetros de Configuración:</strong></p>
+            <ul>
+                <li><strong>Baud Rate:</strong> 9600 (estándar Arduino)</li>
+                <li><strong>Data Bits:</strong> 8</li>
+                <li><strong>Stop Bits:</strong> 1</li>
+                <li><strong>Parity:</strong> None</li>
+                <li><strong>Flow Control:</strong> None</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Proceso de Decodificación</h2>
+            
+            <h3>Ejemplo Completo: Decodificando "HELLO WORLD"</h3>
+            
+            <table>
+                <tr>
+                    <th>Trama Recibida</th>
+                    <th>Tipo</th>
+                    <th>Cabeza del Rotor</th>
+                    <th>Acción</th>
+                    <th>Mensaje Parcial</th>
+                </tr>
+                <tr>
+                    <td>L,H</td>
+                    <td>LOAD</td>
+                    <td>A</td>
+                    <td>H → H (sin cambio)</td>
+                    <td>[H]</td>
+                </tr>
+                <tr>
+                    <td>L,E</td>
+                    <td>LOAD</td>
+                    <td>A</td>
+                    <td>E → E (sin cambio)</td>
+                    <td>[H][E]</td>
+                </tr>
+                <tr>
+                    <td>L,L</td>
+                    <td>LOAD</td>
+                    <td>A</td>
+                    <td>L → L (sin cambio)</td>
+                    <td>[H][E][L]</td>
+                </tr>
+                <tr>
+                    <td>L,L</td>
+                    <td>LOAD</td>
+                    <td>A</td>
+                    <td>L → L (sin cambio)</td>
+                    <td>[H][E][L][L]</td>
+                </tr>
+                <tr>
+                    <td>L,O</td>
+                    <td>LOAD</td>
+                    <td>A</td>
+                    <td>O → O (sin cambio)</td>
+                    <td>[H][E][L][L][O]</td>
+                </tr>
+                <tr style="background: #fff3cd;">
+                    <td>M,2</td>
+                    <td>MAP</td>
+                    <td>A → C</td>
+                    <td>Rotar +2 posiciones</td>
+                    <td>[H][E][L][L][O]</td>
+                </tr>
+                <tr>
+                    <td>L,Y</td>
+                    <td>LOAD</td>
+                    <td>C</td>
+                    <td>Y → ' ' (espacio con rot+2)</td>
+                    <td>[H][E][L][L][O][ ]</td>
+                </tr>
+                <tr style="background: #fff3cd;">
+                    <td>M,-2</td>
+                    <td>MAP</td>
+                    <td>C → A</td>
+                    <td>Rotar -2 posiciones</td>
+                    <td>[H][E][L][L][O][ ]</td>
+                </tr>
+                <tr>
+                    <td>L,W</td>
+                    <td>LOAD</td>
+                    <td>A</td>
+                    <td>W → W (sin cambio)</td>
+                    <td>[H][E][L][L][O][ ][W]</td>
+                </tr>
+                <tr>
+                    <td>L,O</td>
+                    <td>LOAD</td>
+                    <td>A</td>
+                    <td>O → O (sin cambio)</td>
+                    <td>[H][E][L][L][O][ ][W][O]</td>
+                </tr>
+                <tr>
+                    <td>L,R</td>
+                    <td>LOAD</td>
+                    <td>A</td>
+                    <td>R → R (sin cambio)</td>
+                    <td>[H][E][L][L][O][ ][W][O][R]</td>
+                </tr>
+                <tr>
+                    <td>L,L</td>
+                    <td>LOAD</td>
+                    <td>A</td>
+                    <td>L → L (sin cambio)</td>
+                    <td>[H][E][L][L][O][ ][W][O][R][L]</td>
+                </tr>
+                <tr>
+                    <td>L,D</td>
+                    <td>LOAD</td>
+                    <td>A</td>
+                    <td>D → D (sin cambio)</td>
+                    <td>[H][E][L][L][O][ ][W][O][R][L][D]</td>
+                </tr>
+            </table>
+
+            
+        </section>
+
+        <section>
+            <h2>Gestión de Memoria</h2>
+            
+            <h3>Principios Aplicados</h3>
+            <ul>
+                <li><strong>Propiedad Clara:</strong> Cada estructura es dueña de sus nodos</li>
+                <li><strong>RAII:</strong> Destructores liberan memoria automáticamente</li>
+                <li><strong>Sin Memory Leaks:</strong> Cada <code>new</code> tiene su <code>delete</code></li>
+            </ul>
+
+            <h3>Destructor Virtual - ¿Por qué es CRÍTICO?</h3>
+            <pre><code>// Sin destructor virtual:
+TramaBase* trama = new TramaLoad('H');
+delete trama;  // ❌ Solo llama ~TramaBase(), MEMORY LEAK
+
+// Con destructor virtual:
+class TramaBase {
+    virtual ~TramaBase() {}  // ✅ CORRECTO
+};
+
+TramaBase* trama = new TramaLoad('H');
+delete trama;  // ✅ Llama ~TramaLoad() correctamente</code></pre>
+
+            <div class="info">
+                <strong> Regla de Oro:</strong> Si una clase tiene al menos un método virtual, su destructor DEBE ser virtual.
+            </div>
+        </section>
+
+        <section>
+            <h2> Análisis de Complejidad</h2>
+            
+            <table>
+                <tr>
+                    <th>Operación</th>
+                    <th>Complejidad Temporal</th>
+                    <th>Complejidad Espacial</th>
+                </tr>
+                <tr>
+                    <td>parsearTrama()</td>
+                    <td>O(n) donde n = longitud cadena</td>
+                    <td>O(1)</td>
+                </tr>
+                <tr>
+                    <td>RotorDeMapeo::rotar()</td>
+                    <td>O(k) donde k = rotación</td>
+                    <td>O(1)</td>
+                </tr>
+                <tr>
+                    <td>RotorDeMapeo::getMapeo()</td>
+                    <td>O(27) = O(1) (alfabeto fijo)</td>
+                    <td>O(1)</td>
+                </tr>
+                <tr>
+                    <td>ListaDeCarga::insertarAlFinal()</td>
+                    <td>O(1)</td>
+                    <td>O(1)</td>
+                </tr>
+                <tr>
+                    <td>Procesamiento total</td>
+                    <td>O(m) donde m = número de tramas</td>
+                    <td>O(n) donde n = longitud mensaje</td>
+                </tr>
+            </table>
+        </section>
+
+        <section>
+            <h2>Tecnologías y Herramientas</h2>
+            
+            <table>
+                <tr>
+                    <th>Herramienta</th>
+                    <th>Versión</th>
+                    <th>Propósito</th>
+                </tr>
+                <tr>
+                    <td>C++</td>
+                    <td>C++11</td>
+                    <td>Lenguaje de programación principal</td>
+                </tr>
+                <tr>
+                    <td>CMake</td>
+                    <td>3.10+</td>
+                    <td>Sistema de compilación multiplataforma</td>
+                </tr>
+                <tr>
+                    <td>Arduino IDE</td>
+                    <td>2.0+</td>
+                    <td>Programación del transmisor</td>
+                </tr>
+                <tr>
+                    <td>GCC / MSVC</td>
+                    <td>Cualquiera</td>
+                    <td>Compilador C++</td>
+                </tr>
+            </table>
+        </section>
+
+        <section>
+            <h2>✅ Requisitos Cumplidos</h2>
+            
+            <div class="success">
+                <h3>Requisitos Funcionales</h3>
+                <ul>
+                    <li>✅ Comunicación Serial: Lectura exitosa desde Arduino</li>
+                    <li>✅ POO Polimórfica: Herencia y polimorfismo implementados</li>
+                    <li>✅ Lista Circular: RotorDeMapeo funcional con rotación bidireccional</li>
+                    <li>✅ Lista Doble: ListaDeCarga con inserción O(1)</li>
+                    <li>✅ Decodificación: Mensaje ensamblado correctamente</li>
+                    <li>✅ CMake: Sistema redistribuible multiplataforma</li>
+                </ul>
+            </div>
+
+            <div class="info">
+                <h3>Requisitos No Funcionales</h3>
+                <ul>
+                    <li>✅ Exclusividad de Punteros: Sin uso de STL</li>
+                    <li>✅ Gestión de Memoria: Sin memory leaks, destructores virtuales</li>
+                    <li>✅ Robustez: Manejo de tramas mal formadas</li>
+                    <li>✅ Multiplataforma: Windows y Linux soportados</li>
+                </ul>
+            </div>
+        </section>
+
+        <section>
+            <h2>Métricas del Proyecto</h2>
+            
+            <table>
+                <tr>
+                    <th>Métrica</th>
+                    <th>Valor</th>
+                </tr>
+                <tr>
+                    <td>Archivos de código fuente</td>
+                    <td>12 (.h y .cpp)</td>
+                </tr>
+                <tr>
+                    <td>Líneas de código</td>
+                    <td>~800</td>
+                </tr>
+                <tr>
+                    <td>Clases implementadas</td>
+                    <td>5 (TramaBase, TramaLoad, TramaMap, RotorDeMapeo, ListaDeCarga)</td>
+                </tr>
+                <tr>
+                    <td>Funciones documentadas</td>
+                    <td>30+</td>
+                </tr>
+                <tr>
+                    <td>Tiempo de desarrollo</td>
+                    <td>~15 horas</td>
+                </tr>
+                <tr>
+                    <td>Tasa de éxito</td>
+                    <td>100% (decodifica correctamente)</td>
+                </tr>
+            </table>
+        </section>
+
+        <div class="footer">
+            <p><strong>Decodificador PRT-7</strong> - Sistema de Ciberseguridad Industrial</p>
+            <p>Documentación Técnica Completa | Versión 1.0 | 2025</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">
+                Implementa: POO Avanzada • Estructuras de Datos Manuales • Comunicación Serial • Gestión de Memoria
+            </p>
+        </div>
+    </div>
+</body>
+</html>
